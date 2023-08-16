@@ -1,0 +1,8 @@
+drf-yasg==1.21.4
+djangorestframework==3.14.0
+djangorestframework_simplejwt==5.2.2
+psycopg2
+pytest==7.2.0
+pytest-django==4.5.2
+django==4.2.3
+requests~=2.31.0
