@@ -8,7 +8,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from permission.controllers.role_controller import UserRoleController
-from permission.controllers.user_controller import create_password
 from permission.models import RoleUser
 from rest_app.serializers.auth import LoginSerializer, UserSerializer
 
@@ -29,16 +28,13 @@ class AuthViewSet(viewsets.ViewSet):
     def registration(self, request):
         email = request.data["email"]
         username = email
-        #password = request.data["password"]
+        password = request.data["password"]
         try:
             User.objects.get(email=email)
             return Response('Пользователь с таким email уже зарегистрирован', status=400)
         except User.DoesNotExist:
-            password = create_password()
-            password = User.objects.make_random_password()
-            print(password)
             user = User.objects.create(email=email, username=username)
-            user.password = password
+            user.set_password(password)
             user.save()
             RoleUser.objects.create(user=user)
 
@@ -57,9 +53,9 @@ class AuthViewSet(viewsets.ViewSet):
     def login(self, request):
 
         username = request.data["email"]
-        password = str(request.data["password"])
-        print(authenticate(username=username, password=password))
-        user = authenticate(request, username=username, password=password)
+        password = request.data["password"]
+
+        user = authenticate(username=username, password=password)
         if user:
             if user.is_active:
                 try:
@@ -67,7 +63,7 @@ class AuthViewSet(viewsets.ViewSet):
                     UserRoleController(user).set_role()
                 except UserRoleController.NotAccessException:
                     return Response({'detail': 'Нет доступа'}, 400)
-                return Response(status=202)
+                return Response(status=200)
         raise ParseError('Проверьте правильность введенных данных')
 
     @swagger_auto_schema(

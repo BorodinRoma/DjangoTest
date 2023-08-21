@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from core.controllers.bookmark_controller import BookmarkController
 from core.controllers.collection_controller import CollectionController
 from core.models import *
+from core.models import Collection
 from permission.controllers.permission_controller import IsAdmin, IsUser
 
 from rest_app.serializers.core import BookmarkSerializer, BookmarkCreateSerializer, CollectionSerializer, \
@@ -13,8 +14,7 @@ from rest_app.serializers.core import BookmarkSerializer, BookmarkCreateSerializ
 
 
 class BookmarkViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAdmin, IsUser]
-
+    permission_classes = [IsAdmin | IsUser]
     queryset = Bookmark.objects.all()
     http_method_names = ['post', 'get', 'patch', 'delete']
     serializer_class = BookmarkSerializer
@@ -37,7 +37,6 @@ class BookmarkViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         operation_description='Обновить закладку',
-        #request_body=BookmarkPatchSerializer,
         responses={
             201: "Закладка успешно обновлена",
             400: "Ошибка"
@@ -74,6 +73,7 @@ class BookmarkViewSet(viewsets.ModelViewSet):
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdmin | IsUser]
     queryset = Collection.objects.all()
     http_method_names = ['post', 'get', 'patch', 'delete']
     serializer_class = CollectionSerializer

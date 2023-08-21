@@ -12,7 +12,6 @@ class BookmarkController:
         self.user = user
 
     def create_bookmark(self, url) -> Bookmark:
-        # new_data = CommonController(Bookmark).update_data(data)
         site_info = OpenGraphController(url).open_graph_parse()
         bookmark = Bookmark.objects.get_or_create(created_by=self.user, title=str(site_info['title']),
                                                   description=site_info['description'], image=site_info['image'],
