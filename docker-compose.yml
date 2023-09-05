@@ -1,37 +1,20 @@
-# Определение версии Docker Compose и начало описания сервисов
-version: '3'
+version: '3.7'
+
 
 services:
-  django:
-    # Сборка образа для сервиса django из текущей директории
-    build: .
-    # Задание имени контейнера для сервиса django
-    container_name: django
-    # Задание команды, которую нужно запустить при запуске контейнера для сервиса django
-    command: bash -c "python manage.py migrate && python manage.py runserver 127.0.0.1:8000"
-
+  rest_db:
+    image: postgres:15.4
     volumes:
-      - .:/usr/src/app
-    # Открытие порта на хостовой машине и перенаправление на порт в контейнере
+      - postgres_data:/var/lib/postgresql/data/
+
+  rest:
+    build: .
+    command: python /usr/src/django_rest_test/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/django_rest_test
     ports:
       - 8000:8000
-    # Зависимость от другого сервиса
     depends_on:
-      - pgdb
-
-  pgdb:
-    # Использование готового образа postgres
-    image: postgres
-    # Задание переменных окружения для контейнера с postgres
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=1
-     # Задание имени контейнера для сервиса pgdb
-    container_name: pgdb
-     # Связывание тома с директорией в контейнере для сохранения данных postgres
-    volumes:
-      - pgdbdata:/var/lib/postgresql/data/
-
+      - rest_db
 volumes:
-  pgdbdata: null
+  postgres_data:
